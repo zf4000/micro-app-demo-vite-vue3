@@ -1,0 +1,146 @@
+# to do
+
+## 精简demo去掉leftsidebar
+
+## 打包测试生产环境
+
+## 加入自己的子应用
+
+## 学习 Micro-App-DevTools
+
+## 尝试使用native路由(增加可读性)
+
+## 嵌套微应用
+
+## 官方的bug
+
+> 问题1:参数缓存,导致从主应用控制子应用路由切换时,会传入意外的path参数
+
+重现: 基座点击leftsidebar => #/ => #/page2 => 回基座=> #/
+问题描述: 子应用先显示首页,过一会自动跳转到 #/page2
+原因:缓存导致,官方说明:
+setData第一个参数为子应用名称，第二个参数为传递的数据，它发送的数据都会被缓存下来。
+micro-app会遍历新旧值中的每个key判断值是否有变化，如果所有数据都相同则不会发送（注意：只会遍历第一层key），如果数据有变化则将新旧值进行合并后发送。
+参考:
+<https://micro-zoe.github.io/micro-app/docs.html#/zh-cn/data?id=%e4%b8%89%e3%80%81%e4%b8%bb%e5%ba%94%e7%94%a8%e5%90%91%e5%ad%90%e5%ba%94%e7%94%a8%e5%8f%91%e9%80%81%e6%95%b0%e6%8d%ae>
+解决办法: 通过配置或者手工清空数据
+
+```js
+  <micro-app clear-data></micro-app>
+  microApp.clearData('my-app')
+```
+
+- 子应用如果是vite+vue3,vite.子应用不会正常显示
+
+原因:micro-app配置有问题,
+
+vue中必须改为iframe沙箱,且不能 disablesandbox,否则子应用不会正常显示
+
+```vue
+  // main_apps\vite-vue3\src\views\vite.vue
+  <micro-app
+    name="appname-vite"
+    router-mode="search"
+    :url="url"
+    :iframe="true"
+    :disableSandbox="false"
+    inline
+    clear-data
+    :data="microAppData"
+    @created="handleCreate"
+    @beforemount="handleBeforeMount"
+    @mounted="handleMount"
+    @unmount="handleUnmount"
+    @error="handleError"
+    @datachange="handleDataChange"
+  ></micro-app>
+```
+
+- 子应用如果是vite+vue3,vite.子应用无法正确识别是否微应用环境
+
+原因:官方demo关闭了沙箱,通过判断 window["micro-app-appname-vite"] 来识别,
+解决方案: 开启沙箱(disablesandbox=true)后,改为通过 window.__MICRO_APP_ENVIRONMENT__ 进行判断即可
+官方解释:每个应用只能控制自己的路由,不能跨路由控制,所以需要通过消息通知来实现
+
+[参考官方说明](https://micro-zoe.github.io/micro-app/docs.html#/zh-cn/jump)
+
+## 导航控制
+
+[参考](https://micro-zoe.github.io/micro-app/docs.html#/zh-cn/router?id=navigation)
+
+- 子应用中,在本应用内跳转
+常规跳转,
+
+- 子应用控制主应用跳转
+默认情况下，子应用无法直接控制主应用的跳转，为此我们提供了一个API，将主应用的路由对象传递给子应用。
+
+```js
+# 主应用
+import microApp from '@micro-zoe/micro-app'
+// 注册主应用路由
+microApp.router.setBaseAppRouter(主应用的路由对象)
+
+# 子应用
+// 获取主应用路由
+const baseRouter = window.microApp.router.getBaseAppRouter() 
+// 控制主应用跳转
+baseRouter.主应用路由的方法(...) 
+```
+
+- 子应用中,控制其他子应用跳转
+控制其它子应用跳转，并向路由堆栈添加一条新的记录
+
+```js
+/**
+ * @param {string} name 必填，子应用的name
+ * @param {string} path 必填，子应用除域名外的全量地址(也可以带上域名)
+ * @param {boolean} replace 可选，是否使用replace模式，不新增堆栈记录，默认为false
+ */
+window.microApp.router.push({ name: '子应用名称', path: '页面地址', replace: 是否使用replace模式 })
+
+```
+
+- 子应用未激活时,基座控制子应用路由切换
+直接在改变基座路由即可,参考如下:
+
+```js
+const changeChildViteRoute = (_childpath: LocationQueryValueRaw = "/") => {
+  router.push({
+    path: "/app-vite", //对应路由设置属性: path: '/app-vite:page*',
+    query: { "appname-vite": "#"+_childpath }, // key对应<micro-app name>属性
+  });
+  
+  // 或者
+  router.push("/app-vite?appname-vite="+encodeURIComponent("#/page2"));
+
+  // 或者
+   window.location.href = "http://localhost:3000/main-vite/app-vite?appname-vite=%2Fchild%2Fvite%2F%23%2Fpage2";
+  // ==============失败尝试===========
+  // router.push("/app-vite/#/page2");
+  // router.push({
+  //   path: "/app-vite/#/page2",
+  //   path: "/app-vite?appname-vite=%2F%23%2Fpage2",
+  //   path: "/app-vite?appname-vite=%23/page2",
+  //   path: "/app-vite?appname-vite=%2Fchild%2Fvite%2F%23%2Fpage2",
+  // });
+ 
+  
+  
+};
+```
+
+- 子应用激活时,基座中控制子应用路由切换
+
+```js
+  microApp.router.push({
+    name: "child-app",
+    path: "/page2",
+    replace: true,
+    // replace: 是否使用replace模式,
+  });
+  
+```
+
+## 数据通信
+
+[参考官方文档](https://micro-zoe.github.io/micro-app/docs.html#/zh-cn/data?id=%e4%b8%80%e3%80%81%e5%ad%90%e5%ba%94%e7%94%a8%e8%8e%b7%e5%8f%96%e6%9d%a5%e8%87%aa%e4%b8%bb%e5%ba%94%e7%94%a8%e7%9a%84%e6%95%b0%e6%8d%ae)
