@@ -1,20 +1,24 @@
 # 基于micro-app-demo精简优化,只考虑基座和子应用都为vite+vue3的情况,修复了官方bug
 
-## todo
+## 背景描述
 
-## 打包测试生产环境
+公司需要使用微前端,技术栈为vite+vue3+pnpm,
+官方提供的micro-app-demo用的是yarn,且兼顾了很多其他技术栈框架(如react等),测试过程中,发现官方demo未达到预期效果,
+所以就对针对vite+vue3环境下做了相关精简和调整,基本达到预期,
+单独弄了个版本出来,供有学习需要的人参考,
+如觉有用,请给star
 
-## 加入自己的子应用
+## 修改内容
 
-## 学习 Micro-App-DevTools
-
-## 尝试使用native路由(增加可读性)
-
-## 嵌套微应用
+1. 改为了pnpm
+2. 去掉了除vite+vue3之外其他的框架
+3. 去掉了left-sidebar子应用,在基座中直接调用基座side-bar组件
+4. 开启了沙箱功能,加入了iframe模式
+5. 修复了在 vite+vue3下若干bug,参考以下.
 
 ## 官方的bug
 
-> 问题1:参数缓存,导致从主应用控制子应用路由切换时,会传入意外的path参数
+- 问题1:参数缓存,导致从主应用控制子应用路由切换时,会传入意外的path参数
 
 重现: 基座点击leftsidebar => #/ => #/page2 => 回基座=> #/
 问题描述: 子应用先显示首页,过一会自动跳转到 #/page2
@@ -30,9 +34,9 @@ micro-app会遍历新旧值中的每个key判断值是否有变化，如果所�
   microApp.clearData('my-app')
 ```
 
-- 子应用如果是vite+vue3,vite.子应用不会正常显示
+- 问题2:子应用无法正常渲染
 
-原因:micro-app配置有问题,
+原因:micro-app配置有问题,关闭了沙箱,而最新的micro-app已经支持了vite下开启沙箱
 
 vue中必须改为iframe沙箱,且不能 disablesandbox,否则子应用不会正常显示
 
@@ -56,7 +60,7 @@ vue中必须改为iframe沙箱,且不能 disablesandbox,否则子应用不会正
   ></micro-app>
 ```
 
-- 子应用如果是vite+vue3,vite.子应用无法正确识别是否微应用环境
+- 问题3: 子应用无法正确识别是否微应用环境
 
 原因:官方demo关闭了沙箱,通过判断 window["micro-app-appname-vite"] 来识别,
 解决方案: 开启沙箱(disablesandbox=true)后,改为通过 window.__MICRO_APP_ENVIRONMENT__ 进行判断即可
