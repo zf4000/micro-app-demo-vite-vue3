@@ -1,6 +1,6 @@
-# to do
+# 基于micro-app-demo精简优化,只考虑基座和子应用都为vite+vue3的情况,修复了官方bug
 
-## 精简demo去掉leftsidebar
+## todo
 
 ## 打包测试生产环境
 
