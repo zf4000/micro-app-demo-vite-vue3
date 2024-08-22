@@ -57,8 +57,8 @@ watch(
     // console.log("warth", { from, to }, route);
     const newRoute = route;
     const { path, query } = newRoute;
-    const hash = Object.values(query)[0]?.split("#")[1];
-    console.log("路由变化,改变left-sidebar当前菜单", { path, hash });
+    const hash = (Object.values(query)[0] as string)?.split("#")[1];
+    // console.log("路由变化,改变left-sidebar当前菜单", { path, hash });
 
     setTimeout(() => {
       activeIndex.value = `${path}${!hash || hash === "/" ? "" : hash}`;
@@ -71,7 +71,7 @@ watch(
  * @param index men_item.index
  * @param indexPath men_item的路径
  */
-const select = (index, indexPath) => {
+const select = (index: string, indexPath: string) => {
   // console.log("当前点击的path:", index);
   // 因为 child-vite 和 child-react17 子应用是hash路由，所以需要传递hash值
   const appName = indexPath[0];
@@ -95,7 +95,7 @@ const select = (index, indexPath) => {
  * 判断是否微应用路径
  * @param {*} path menu_item传入的index
  */
-const isMicroPath = (path) => {
+const isMicroPath = (path: string) => {
   // 获得所有的微应用路由地址 : 包含 :page*
   const microKeys = router
     .getRoutes()
@@ -116,7 +116,7 @@ const isMicroPath = (path) => {
  * 解析路径中的 path hash
  * @param {*} index : 带解析的路径 /app-vite/p1/p2?a=aa&b=bby#hhh
  */
-const resolveMicroPath = (index) => {
+const resolveMicroPath = (index: string) => {
   // 路由中可能带有query参数,可能有后续处理 to do
   const _r = router.resolve(index);
   const { path: _path, query: _query, hash: _hash } = _r;

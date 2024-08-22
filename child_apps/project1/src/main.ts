@@ -38,7 +38,7 @@ app.use(router);
 app.mount("#app");
 
 if (isMicroapp) {
-  console.log("子应用中监听基座消息");
+  // console.log("子应用中监听基座消息");
   // 监听基座传入数据
   window.microApp.addDataListener((data: any) => {
     console.log("子应用发现基座消息", data);
