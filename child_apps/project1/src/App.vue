@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+// import HelloWorld from "./components/HelloWorld.vue";
 </script>
 
 <template>
   <div>
     使用 pnpm create vite project1 --template vue-ts 搭建的另一个子应用
     <div>
-      <!-- <router-link to="/page1">page1</router-link>
+      <router-link to="/">home</router-link>
       |
-      <router-link to="/page2">page2</router-link> -->
-
+      <router-link to="/page1">page1</router-link>
+      <router-view></router-view>
     </div>
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
 <style scoped>

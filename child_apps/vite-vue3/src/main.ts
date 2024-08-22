@@ -12,7 +12,7 @@ declare global {
   interface Window {
     // 关闭沙箱时,不存在window.eventCenterForAppNameVite对象 2024年8月20日 by jeff
     // eventCenterForAppNameVite: any;
-    microApp: any;//EventCenterForMicroApp
+    microApp: any; //EventCenterForMicroApp
     __MICRO_APP_NAME__: string;
     __MICRO_APP_ENVIRONMENT__: string;
     __MICRO_APP_BASE_APPLICATION__: string;
@@ -193,11 +193,10 @@ function unmount() {
 }
 
 // 微前端环境下，注册mount和unmount方法
+console.warn("检测微应用环境", window.__MICRO_APP_ENVIRONMENT__);
 if (window.__MICRO_APP_ENVIRONMENT__) {
-  console.warn("检测到微应用环境");
   // @ts-ignore
   // window["micro-app-appname-vite"] = { mount, unmount };
-
   // 2024年8月21日 by jeff
   window[`micro-app-${window.__MICRO_APP_NAME__}`] = { mount, unmount };
 } else {

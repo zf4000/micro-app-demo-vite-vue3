@@ -38,57 +38,96 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 // import microApp from "@micro-zoe/micro-app";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
+import { ref, watch } from "vue";
 
-export default {
-  name: "App",
-  data() {
-    return {
-      activeIndex: "/", // 当前激活菜单的 index
-    };
-  },
-  watch: {
-    // 监听到路由变化时,改变left-sidebar的当前行信息
-    $route: {
-      handler: function (newRoute, oldRoute) {
-        const { path, query } = newRoute;
-        const hash = Object.values(query)[0]?.split("#")[1];
-        console.warn({ path, hash });
+const emit = defineEmits(["select"]);
 
-        setTimeout(() => {
-          // this.activeIndex = "/app-vite/page2";
-          // console.warn({ path, hash });
-          this.activeIndex = `${path}${!hash || hash === "/" ? "" : hash}`;
-        }, 500);
-      },
-      // immediate: true // 立即执行一次
-    },
-  },
-  created() {
-    this.router = useRouter();
-  },
-  methods: {
-    // 用户点击菜单时控制基座应用跳转
-    select(index, indexPath) {
-      // console.log("selec fired", { index, indexPath, microApp });
-      // 因为 child-vite 和 child-react17 子应用是hash路由，所以需要传递hash值
-      let hash = null;
-      if (index === "/app-vite/page2") {
-        const pathArr = index.split("/");
-        index = "/" + pathArr[1];
-        hash = "/" + pathArr[2];
-      }
+const router = useRouter();
+let route = useRoute();
 
-      // 获取子应用appName
-      const appName = indexPath[0];
+const activeIndex = ref("/");
 
-      // 基座控制子应用跳转.根据子应用是否激活来判断如何控制(未激活直接修改路由,否则传递参数) 2024年8月21日 by jeff
-      let path = index;
-      this.$emit("select", appName, path, hash);
-    },
-  },
+// 监听路由变化改变left-sidebar的当前菜单
+watch(
+  () => route.fullPath,
+  (to, from) => {
+    // console.log("warth", { from, to }, route);
+    const newRoute = route;
+    const { path, query } = newRoute;
+    const hash = Object.values(query)[0]?.split("#")[1];
+    console.log("路由变化,改变left-sidebar当前菜单", { path, hash });
+
+    setTimeout(() => {
+      activeIndex.value = `${path}${!hash || hash === "/" ? "" : hash}`;
+    }, 0);
+  }
+);
+
+/**
+ * 点击menu_item触发
+ * @param index men_item.index
+ * @param indexPath men_item的路径
+ */
+const select = (index, indexPath) => {
+  // console.log("当前点击的path:", index);
+  // 因为 child-vite 和 child-react17 子应用是hash路由，所以需要传递hash值
+  const appName = indexPath[0];
+  let hash = null;
+  let path = index;
+
+  // 判断index是否为微应用路径
+  if (isMicroPath(index)) {
+    console.log("将要访问子应用");
+    //解析出 path,hash
+    const { path: _path, hash: _hash } = resolveMicroPath(index);
+    path = _path;
+    hash = _hash;
+    // console.log("解析结果:", { path, hash });
+  }
+  console.warn("left-sidebar 解析结果:", { appName, path, hash });
+  emit("select", appName, path, hash);
+};
+
+/**
+ * 判断是否微应用路径
+ * @param {*} path menu_item传入的index
+ */
+const isMicroPath = (path) => {
+  // 获得所有的微应用路由地址 : 包含 :page*
+  const microKeys = router
+    .getRoutes()
+    .filter((item) => {
+      return item.path.includes(":page*");
+    })
+    .map((item) => {
+      const r = item.path.replace("/", "");
+      return r.replace(":page*", "");
+    });
+
+  // 如果path中包含了microKeys中任何一个,return true;
+  return microKeys.some((item) => {
+    return path.includes(item);
+  });
+};
+/**
+ * 解析路径中的 path hash
+ * @param {*} index : 带解析的路径 /app-vite/p1/p2?a=aa&b=bby#hhh
+ */
+const resolveMicroPath = (index) => {
+  // 路由中可能带有query参数,可能有后续处理 to do
+  const _r = router.resolve(index);
+  const { path: _path, query: _query, hash: _hash } = _r;
+
+  const pathArr = index.split("/");
+  const path = "/" + pathArr[1];
+  const hash = pathArr[2] ? `/${pathArr[2]}` : undefined;
+  // const hash = "hash";
+  // debugger;
+  // console.warn({ path, hash });
+  return { path, hash };
 };
 </script>
 

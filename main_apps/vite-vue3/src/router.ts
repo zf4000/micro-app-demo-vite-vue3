@@ -22,11 +22,12 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     // 自建的另一个子应用
+    // /app-project?xxx 匹配
+    // /app-project1/xxx不匹配
     path: "/app-project1:page*",
     name: "project1",
     component: () => import("./views/project1.vue"),
   },
-  
 ];
 
 const router = createRouter({
