@@ -12,8 +12,8 @@
       <el-menu-item index="/welcome">
         <template #title>welcome</template>
       </el-menu-item>
-      <!-- 菜单(el-submenu) index为子应用名称，子菜单(el-menu-item) index为路由地址 -->
 
+      <!-- 菜单(el-submenu) index为子应用名称，子菜单(el-menu-item) index为路由地址 -->
       <el-sub-menu index="appname-vite">
         <template #title>官方vite+vue3子应用</template>
         <el-menu-item index="/app-vite">
@@ -21,6 +21,17 @@
         </el-menu-item>
         <el-menu-item index="/app-vite/page2">
           <span class="menu-item-text">page2</span>
+        </el-menu-item>
+      </el-sub-menu>
+
+      <!-- el-sub-menu index为子应用名称(<micro-app name='子应用名称'),必须保持一致  -->
+      <el-sub-menu index="appname-project1">
+        <template #title>project1</template>
+        <el-menu-item index="/app-project1">
+          <span class="menu-item-text">首页</span>
+        </el-menu-item>
+        <el-menu-item index="/app-project1/page1">
+          <span class="menu-item-text">page1</span>
         </el-menu-item>
       </el-sub-menu>
     </el-menu>

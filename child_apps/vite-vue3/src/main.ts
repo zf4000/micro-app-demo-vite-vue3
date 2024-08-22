@@ -12,7 +12,7 @@ declare global {
   interface Window {
     // 关闭沙箱时,不存在window.eventCenterForAppNameVite对象 2024年8月20日 by jeff
     // eventCenterForAppNameVite: any;
-    microApp: any;
+    microApp: any;//EventCenterForMicroApp
     __MICRO_APP_NAME__: string;
     __MICRO_APP_ENVIRONMENT__: string;
     __MICRO_APP_BASE_APPLICATION__: string;

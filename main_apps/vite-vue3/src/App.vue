@@ -94,6 +94,7 @@ const sidebarData = {
      * getActiveApps: 用于获取正在运行的子应用
      */
     if (!getActiveApps().includes(appName)) {
+      console.log('活动中app,',getActiveApps(),'当前appName:',appName);
       console.warn("子应用未激活状态,基座中切换路由,path处理结果:", {
         appName,
         path,

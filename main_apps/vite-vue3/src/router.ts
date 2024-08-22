@@ -20,6 +20,13 @@ const routes: Array<RouteRecordRaw> = [
     name: "vite",
     component: () => import("./views/vite.vue"),
   },
+  {
+    // 自建的另一个子应用
+    path: "/app-project1:page*",
+    name: "project1",
+    component: () => import("./views/project1.vue"),
+  },
+  
 ];
 
 const router = createRouter({
