@@ -1,14 +1,41 @@
-# 基于micro-app-demo精简优化,只考虑基座和子应用都为vite+vue3的情况,修复了官方bug
+# 基于micro-app-demo精简优化,针对基座和子应用都为vite+vue3的情况
 
 ## 背景描述
 
-公司需要使用微前端,技术栈为vite+vue3+pnpm,
+公司技术栈为vite+vue3+pnpm,打算使用微前端技术,方便后期扩展,选型为micro-app
 
-官方提供的micro-app-demo用的是yarn,且兼顾了很多其他技术栈框架(如react等),测试过程中,发现官方demo未达到预期效果,
+发现官方的demo在vite+vue3情况下存在一些问题:
 
-索性单独弄了个版本出来,针对vite+vue3环境下做了相关精简和调整,基本达到预期效果
+1. 用的是yarn
+2. 兼顾了很多其他技术栈框架(如react等),代码相对vite+vue3而言有些冗余
+3. 运行时默认关闭了沙箱,导致子应用无法正常显示(最新的micro-app版本好像已经支持开启沙箱,demo未同步更新)
+4. 无法在基座中进入子应用特定页面
+5. 其他一些小问题
 
-供有学习需要的人参考,如觉有用,请给star
+索性单独弄了个版本出来,针对vite+vue3环境下做了相关精简和调整,基本达到预期效果,
+
+有需要的人,请参考,
+
+调整过程中,花了不少时间,如觉有用,请star
+
+## 使用方法
+
+分别进入 /main_apps/vite-vue3 和 /child_apps/vite-vue3
+
+pnpm i
+
+pnpm dev
+
+访问 http://localhost:3000 即可
+
+## 版本
+
+micro-app: v1.0.0-rc.6
+vue:3.4.38
+vue-router: "4.4.3"
+vite": 2.9.18
+pmpm : 8.15.5
+node: v16.17.0
 
 ## 修改内容
 
